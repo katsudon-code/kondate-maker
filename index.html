@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>大人向け 献立メーカーPro v1.1</title>
+<title>大人向け 献立メーカーPro v1.3</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 :root{--primary:#4f46e5}body{background-color:#f9fafb;-webkit-tap-highlight-color:transparent}
@@ -16,7 +16,7 @@
 <div class="max-w-lg mx-auto bg-white min-h-screen shadow-sm sm:rounded-xl sm:my-8 sm:min-h-0 sm:pb-8 overflow-hidden">
     
     <header class="bg-indigo-600 text-white p-4 flex justify-between items-center relative z-10 shadow-md">
-        <h1 class="text-xl font-bold tracking-wider flex items-center">献立メーカー<span class="font-light text-indigo-200">Pro</span><span class="ml-2 text-xs font-mono bg-indigo-500 px-2 py-0.5 rounded-full shadow-inner">v1.1</span></h1>
+        <h1 class="text-xl font-bold tracking-wider flex items-center">献立メーカー<span class="font-light text-indigo-200">Pro</span><span class="ml-2 text-xs font-mono bg-indigo-500 px-2 py-0.5 rounded-full shadow-inner">v1.3</span></h1>
         <button onclick="toggleSettings()" class="text-indigo-100 hover:text-white transition p-2 focus:outline-none flex items-center bg-indigo-700/50 rounded-lg px-3 py-1.5"><span id="key-status-icon" class="mr-1 text-xs">⚠️</span><span class="text-sm font-medium">設定</span></button>
     </header>
 
@@ -89,7 +89,9 @@ function updateKeyUI(){
 }
 
 function saveAllSettings(){
-    const k=document.getElementById('api-key').value.trim();if(k)localStorage.setItem('gemini_api_key',k);
+    const k=document.getElementById('api-key').value;
+    const cleanK=k.replace(/[\r\n\s]/g, ""); 
+    if(cleanK)localStorage.setItem('gemini_api_key',cleanK);
     localStorage.setItem('k_st_i',document.getElementById('stock-ingredients').value.trim()||DEF_I);
     localStorage.setItem('k_st_s',document.getElementById('stock-seasonings').value.trim()||DEF_S);
     showNotif('✅ 設定を保存しました');toggleSettings();updateKeyUI();
@@ -99,8 +101,10 @@ function clearApiKey(){if(confirm('削除しますか？')){localStorage.removeI
 window.onload=function(){updateKeyUI();if(!localStorage.getItem('k_st_i')){localStorage.setItem('k_st_i',DEF_I);localStorage.setItem('k_st_s',DEF_S);}}
 
 async function generateRecipe(){
-    const key=localStorage.getItem('gemini_api_key');
-    if(!key){showNotif('設定からAPIキーを登録してください',true);toggleSettings();return;}
+    const rawKey=localStorage.getItem('gemini_api_key');
+    if(!rawKey){showNotif('設定からAPIキーを登録してください',true);toggleSettings();return;}
+    const key=rawKey.replace(/[\r\n\s]/g, ""); 
+    
     const t=document.getElementById('ingredients-text').value.trim(), r=document.getElementById('requirements-text').value.trim();
     const g=document.querySelector('input[name="genre"]:checked').value, m=document.querySelector('input[name="mode"]:checked').value;
     const o=[];if(document.getElementById('opt-jitan').checked)o.push("時短");if(document.getElementById('opt-oiwai').checked)o.push("お祝い");if(document.getElementById('opt-tsukurioki').checked)o.push("作り置き");
@@ -114,15 +118,21 @@ async function generateRecipe(){
         const sea=getSeason(), fStr=m==="side_only"?`{"sideDishes":[{"name":"名1","recipe":"作り方(2〜3行)"},{"name":"名2","recipe":"作り方"},{"name":"名3","recipe":"作り方"}]}`:`{"mainDishes":[{"name":"主菜1","recipe":"作り方(大人向け)"},{"name":"主菜2","recipe":"作り方"},{"name":"主菜3","recipe":"作り方"}],"sideDish":{"name":"副菜名","recipe":"作り方(1行)"}}`;
         const sys=`プロの料理研究家。JSON形式のみで出力。\n常備食材:${localStorage.getItem('k_st_i')}\n常備調味料:${localStorage.getItem('k_st_s')}\n季節感:${sea.s}\nフォーマット:\n${fStr}`;
         
-        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
-            method:'POST',headers:{'Content-Type':'application/json'},
+        // 【修正】cURLの通りにURLとヘッダーを完全に一致させました
+        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'X-goog-api-key': key
+            },
             body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:[{role:"user",parts:[{text:ut}]}],generationConfig:{temperature:0.85,response_mime_type:"application/json"}})
         });
+        
         if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(`APIエラー: ${res.status} ${err.error?.message||''}`);}
         
         const d=await res.json(), raw=d.candidates[0].content.parts[0].text.replace(/```json/gi,'').replace(/```/g,'').trim();
         renderRes(JSON.parse(raw),m,sea.b);
-    }catch(e){alert(e.message+"\nAPIキーを確認してください。");}finally{btn.disabled=false;document.getElementById('btn-text').textContent='AIに提案してもらう';sp.classList.add('hidden');}
+    }catch(e){alert(e.message+"\n※設定画面から、念のためAPIキーをもう一度貼り付け直してみてください。");}finally{btn.disabled=false;document.getElementById('btn-text').textContent='AIに提案してもらう';sp.classList.add('hidden');}
 }
 
 function renderRes(d,m,bTxt){
@@ -144,4 +154,3 @@ function eH(s){return s?String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;'
 </script>
 </body>
 </html>
-
