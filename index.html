@@ -1,323 +1,147 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>大人向け 献立メーカーPro v1.1</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root { 
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-        }
-        body { 
-            background-color: #f9fafb;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* ラジオボタン共通スタイル */
-        .custom-radio:checked + span {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
-            transform: translateY(-1px);
-        }
-        .radio-label-span {
-            transition: all 0.2s ease;
-        }
-
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* スクロールバーのカスタマイズ */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-    </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>大人向け 献立メーカーPro v1.1</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--primary:#4f46e5}body{background-color:#f9fafb;-webkit-tap-highlight-color:transparent}
+.custom-radio:checked+span{background-color:var(--primary);color:white;border-color:var(--primary);font-weight:600;box-shadow:0 4px 6px -1px rgba(79,70,229,0.3);transform:translateY(-1px)}
+.loader{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.custom-scrollbar::-webkit-scrollbar{width:6px}.custom-scrollbar::-webkit-scrollbar-track{background:#f1f1f1;border-radius:4px}.custom-scrollbar::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+</style>
 </head>
 <body class="text-gray-800 antialiased pb-20">
-
 <div class="max-w-lg mx-auto bg-white min-h-screen shadow-sm sm:rounded-xl sm:my-8 sm:min-h-0 sm:pb-8 overflow-hidden">
     
     <header class="bg-indigo-600 text-white p-4 flex justify-between items-center relative z-10 shadow-md">
-        <h1 class="text-xl font-bold tracking-wider flex items-center">
-            献立メーカー<span class="font-light text-indigo-200">Pro</span>
-            <span class="ml-2 text-xs font-mono bg-indigo-500 px-2 py-0.5 rounded-full shadow-inner">v1.1</span>
-        </h1>
-        <button onclick="toggleSettings()" class="text-indigo-100 hover:text-white transition p-2 focus:outline-none flex items-center bg-indigo-700/50 rounded-lg px-3 py-1.5">
-            <span id="key-status-icon" class="mr-1 text-xs">⚠️</span>
-            <span class="text-sm font-medium">設定</span>
-        </button>
+        <h1 class="text-xl font-bold tracking-wider flex items-center">献立メーカー<span class="font-light text-indigo-200">Pro</span><span class="ml-2 text-xs font-mono bg-indigo-500 px-2 py-0.5 rounded-full shadow-inner">v1.1</span></h1>
+        <button onclick="toggleSettings()" class="text-indigo-100 hover:text-white transition p-2 focus:outline-none flex items-center bg-indigo-700/50 rounded-lg px-3 py-1.5"><span id="key-status-icon" class="mr-1 text-xs">⚠️</span><span class="text-sm font-medium">設定</span></button>
     </header>
 
     <div id="settings-area" class="hidden bg-gray-50 border-b border-gray-200 p-6 shadow-inner transition-all h-[80vh] overflow-y-auto">
-        <h2 class="text-lg font-bold text-gray-800 mb-4 border-b-2 border-indigo-200 pb-2 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            アプリ設定
-        </h2>
-
+        <h2 class="text-lg font-bold text-gray-800 mb-4 border-b-2 border-indigo-200 pb-2 flex items-center">⚙️ アプリ設定</h2>
         <div class="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
             <h3 class="text-sm font-bold text-gray-700 mb-2">🔑 APIキー</h3>
-            <p class="text-xs text-gray-500 mb-3">Google AI StudioのAPIキー。</p>
-            
-            <div id="current-key-status" class="mb-3 p-2 bg-gray-50 border border-gray-200 rounded flex justify-between items-center hidden">
-                <span id="masked-key" class="font-mono text-gray-600 text-xs tracking-widest"></span>
-                <button onclick="clearApiKey()" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-white border border-red-200 rounded transition">削除</button>
-            </div>
+            <div id="current-key-status" class="mb-3 p-2 bg-gray-50 border border-gray-200 rounded flex justify-between items-center hidden"><span id="masked-key" class="font-mono text-gray-600 text-xs tracking-widest"></span><button onclick="clearApiKey()" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 bg-white border border-red-200 rounded transition">削除</button></div>
             <input type="password" id="api-key" placeholder="APIキーを入力" class="w-full p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
         </div>
-
-        <div class="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-sm font-bold text-gray-700 mb-1 flex items-center">
-                <span class="mr-1">🥦</span> いつもある食材・ストック
-            </h3>
-            <textarea id="stock-ingredients" rows="4" class="custom-scrollbar w-full p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-700 leading-relaxed"></textarea>
-        </div>
-
-        <div class="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-sm font-bold text-gray-700 mb-1 flex items-center">
-                <span class="mr-1">🧂</span> いつもある調味料・油
-            </h3>
-            <textarea id="stock-seasonings" rows="4" class="custom-scrollbar w-full p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-700 leading-relaxed"></textarea>
-            <div class="mt-2 text-right">
-                <button onclick="resetStockToDefault()" class="text-xs text-indigo-600 hover:text-indigo-800 underline">初期値に戻す</button>
-            </div>
-        </div>
-
-        <div class="flex justify-end space-x-3 sticky bottom-0 bg-gray-50 py-2 border-t border-gray-200">
-            <button onclick="toggleSettings()" class="px-5 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium shadow-sm transition">キャンセル</button>
-            <button onclick="saveAllSettings()" class="px-5 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md font-bold transition">設定を保存</button>
-        </div>
+        <div class="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm"><h3 class="text-sm font-bold text-gray-700 mb-1 flex items-center"><span class="mr-1">🥦</span> いつもある食材</h3><textarea id="stock-ingredients" rows="4" class="custom-scrollbar w-full p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-700 leading-relaxed"></textarea></div>
+        <div class="mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm"><h3 class="text-sm font-bold text-gray-700 mb-1 flex items-center"><span class="mr-1">🧂</span> いつもある調味料</h3><textarea id="stock-seasonings" rows="4" class="custom-scrollbar w-full p-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-700 leading-relaxed"></textarea><div class="mt-2 text-right"><button onclick="resetStockToDefault()" class="text-xs text-indigo-600 hover:text-indigo-800 underline">初期値に戻す</button></div></div>
+        <div class="flex justify-end space-x-3 sticky bottom-0 bg-gray-50 py-2 border-t border-gray-200"><button onclick="toggleSettings()" class="px-5 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 font-medium shadow-sm transition">キャンセル</button><button onclick="saveAllSettings()" class="px-5 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md font-bold transition">設定を保存</button></div>
     </div>
 
     <main class="p-6">
-        <section class="mb-6">
-            <h2 class="text-lg font-bold text-gray-800 mb-2 flex items-center">
-                <span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">1</span>
-                今日使いたい食材
-            </h2>
-            <textarea id="ingredients-text" rows="2" placeholder="例：特売の鶏肉、少し残ったキャベツ" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm text-base placeholder-gray-400"></textarea>
-        </section>
-
-        <section class="mb-6">
-            <h2 class="text-lg font-bold text-gray-800 mb-2 flex items-center">
-                <span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">2</span>
-                細かい要望・補足 (任意)
-            </h2>
-            <textarea id="requirements-text" rows="2" placeholder="例：フライパン1つで作りたい、さっぱりしたものがいい" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm text-base placeholder-gray-400 bg-gray-50"></textarea>
-        </section>
-
-        <section class="mb-6">
-            <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
-                <span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">3</span>
-                今日の気分
-            </h2>
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <label class="cursor-pointer"><input type="radio" name="genre" value="和風" class="custom-radio hidden" checked><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white">🇯🇵 和風</span></label>
-                <label class="cursor-pointer"><input type="radio" name="genre" value="洋風" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white">🇺🇸 洋風</span></label>
-                <label class="cursor-pointer"><input type="radio" name="genre" value="中華風" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white">🇨🇳 中華風</span></label>
-                <label class="cursor-pointer"><input type="radio" name="genre" value="ジャンル問わず、食材に最も合う美味しい組み合わせ" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white text-sm flex items-center justify-center">🎲 おまかせ</span></label>
-            </div>
-        </section>
-
-        <section class="mb-6">
-            <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
-                <span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">4</span>
-                提案内容
-            </h2>
-            <div class="flex space-x-3">
-                <label class="cursor-pointer flex-1"><input type="radio" name="mode" value="full" class="custom-radio hidden" checked><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white text-sm font-medium">🍱 献立 (主菜+副菜)</span></label>
-                <label class="cursor-pointer flex-1"><input type="radio" name="mode" value="side_only" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white text-sm font-medium">🥗 副菜のみ (3案)</span></label>
-            </div>
-        </section>
-
-        <section class="mb-8">
-            <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
-                <span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">5</span>
-                追加オプション
-            </h2>
-            <div class="flex flex-wrap gap-3">
-                <label class="cursor-pointer"><input type="checkbox" id="opt-jitan" class="peer hidden"><span class="block px-4 py-2 border-2 border-gray-200 rounded-full text-sm text-gray-600 font-medium peer-checked:bg-blue-100 peer-checked:text-blue-800 peer-checked:border-blue-400 transition-all select-none shadow-sm">⏱️ 時短</span></label>
-                <label class="cursor-pointer"><input type="checkbox" id="opt-oiwai" class="peer hidden"><span class="block px-4 py-2 border-2 border-gray-200 rounded-full text-sm text-gray-600 font-medium peer-checked:bg-pink-100 peer-checked:text-pink-800 peer-checked:border-pink-400 transition-all select-none shadow-sm">🎉 お祝い</span></label>
-                <label class="cursor-pointer"><input type="checkbox" id="opt-tsukurioki" class="peer hidden"><span class="block px-4 py-2 border-2 border-gray-200 rounded-full text-sm text-gray-600 font-medium peer-checked:bg-green-100 peer-checked:text-green-800 peer-checked:border-green-400 transition-all select-none shadow-sm">🍱 作り置き</span></label>
-            </div>
-        </section>
-
-        <button id="submit-btn" onclick="generateRecipe()" class="w-full bg-indigo-600 text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-colors focus:ring-4 focus:ring-indigo-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex justify-center items-center">
-            <span id="btn-text">AIに提案してもらう</span>
-            <div id="loading-spinner" class="hidden loader ml-3 border-t-white border-white/30 h-6 w-6 border-2"></div>
-        </button>
-
-        <div id="result-area" class="mt-8 hidden">
-            <hr class="my-6 border-gray-200">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center text-indigo-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                    <span id="result-title-text">今日の提案メニュー</span>
-                </h2>
-                <span id="season-badge" class="text-xs font-bold px-2 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-200 shadow-sm hidden">季節感アリ</span>
-            </div>
-            
-            <div class="space-y-4" id="main-dishes-container"></div>
-
-            <div id="side-dish-container-box" class="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-5 shadow-sm hidden">
-                <h3 class="font-bold text-blue-800 mb-2 flex items-center text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                    </svg>
-                    おすすめの副菜 (1品)
-                </h3>
-                <div id="side-dish-container" class="text-gray-700 text-sm leading-relaxed"></div>
-            </div>
-        </div>
+        <section class="mb-6"><h2 class="text-lg font-bold text-gray-800 mb-2 flex items-center"><span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">1</span>今日使いたい食材</h2><textarea id="ingredients-text" rows="2" placeholder="例：特売の鶏肉、少し残ったキャベツ" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm text-base placeholder-gray-400"></textarea></section>
+        <section class="mb-6"><h2 class="text-lg font-bold text-gray-800 mb-2 flex items-center"><span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">2</span>細かい要望・補足 (任意)</h2><textarea id="requirements-text" rows="2" placeholder="例：フライパン1つで作りたい、さっぱりしたものがいい" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm text-base placeholder-gray-400 bg-gray-50"></textarea></section>
+        <section class="mb-6"><h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center"><span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">3</span>今日の気分</h2><div class="grid grid-cols-2 gap-3 mb-3"><label class="cursor-pointer"><input type="radio" name="genre" value="和風" class="custom-radio hidden" checked><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white">🇯🇵 和風</span></label><label class="cursor-pointer"><input type="radio" name="genre" value="洋風" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white">🇺🇸 洋風</span></label><label class="cursor-pointer"><input type="radio" name="genre" value="中華風" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white">🇨🇳 中華風</span></label><label class="cursor-pointer"><input type="radio" name="genre" value="ジャンル問わず、食材に最も合う美味しい組み合わせ" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white text-sm flex items-center justify-center">🎲 おまかせ</span></label></div></section>
+        <section class="mb-6"><h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center"><span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">4</span>提案内容</h2><div class="flex space-x-3"><label class="cursor-pointer flex-1"><input type="radio" name="mode" value="full" class="custom-radio hidden" checked><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white text-sm font-medium">🍱 献立 (主菜+副菜)</span></label><label class="cursor-pointer flex-1"><input type="radio" name="mode" value="side_only" class="custom-radio hidden"><span class="radio-label-span block text-center p-3 border-2 border-gray-200 rounded-xl text-gray-600 bg-white text-sm font-medium">🥗 副菜のみ (3案)</span></label></div></section>
+        <section class="mb-8"><h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center"><span class="bg-indigo-100 text-indigo-800 text-sm w-6 h-6 rounded-full inline-flex items-center justify-center mr-2">5</span>追加オプション</h2><div class="flex flex-wrap gap-3"><label class="cursor-pointer"><input type="checkbox" id="opt-jitan" class="peer hidden"><span class="block px-4 py-2 border-2 border-gray-200 rounded-full text-sm text-gray-600 font-medium peer-checked:bg-blue-100 peer-checked:text-blue-800 peer-checked:border-blue-400 transition-all select-none shadow-sm">⏱️ 時短</span></label><label class="cursor-pointer"><input type="checkbox" id="opt-oiwai" class="peer hidden"><span class="block px-4 py-2 border-2 border-gray-200 rounded-full text-sm text-gray-600 font-medium peer-checked:bg-pink-100 peer-checked:text-pink-800 peer-checked:border-pink-400 transition-all select-none shadow-sm">🎉 お祝い</span></label><label class="cursor-pointer"><input type="checkbox" id="opt-tsukurioki" class="peer hidden"><span class="block px-4 py-2 border-2 border-gray-200 rounded-full text-sm text-gray-600 font-medium peer-checked:bg-green-100 peer-checked:text-green-800 peer-checked:border-green-400 transition-all select-none shadow-sm">🍱 作り置き</span></label></div></section>
+        <button id="submit-btn" onclick="generateRecipe()" class="w-full bg-indigo-600 text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition-colors focus:ring-4 focus:ring-indigo-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex justify-center items-center"><span id="btn-text">AIに提案してもらう</span><div id="loading-spinner" class="hidden loader ml-3 border-t-white border-white/30 h-6 w-6 border-2"></div></button>
+        <div id="result-area" class="mt-8 hidden"><hr class="my-6 border-gray-200"><div class="flex items-center justify-between mb-4"><h2 class="text-xl font-bold text-gray-800 flex items-center text-indigo-700"><span id="result-title-text">今日の提案メニュー</span></h2><span id="season-badge" class="text-xs font-bold px-2 py-1 rounded-full bg-orange-100 text-orange-800 border border-orange-200 shadow-sm hidden">季節感</span></div><div class="space-y-4" id="main-dishes-container"></div><div id="side-dish-container-box" class="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-5 shadow-sm hidden"><h3 class="font-bold text-blue-800 mb-2 flex items-center text-sm">おすすめの副菜 (1品)</h3><div id="side-dish-container" class="text-gray-700 text-sm leading-relaxed"></div></div></div>
     </main>
 </div>
 
 <script>
-    const DEFAULT_STOCK_INGREDIENTS = "にんじん、たまねぎ、キノコ類(えのき、しめじ)、葉物野菜(小松菜またはほうれん草)、豆腐、たまご、豚バラ、合挽き肉、パスタ、米、お麩、塩昆布、かつおぶし、トマト缶";
-    const DEFAULT_STOCK_SEASONINGS = "醤油、塩、砂糖、味醂、味噌、酒、本だし、鶏ガラスープの元、コンソメ、ニンニクチューブ、生姜チューブ、白だし、鷹の爪、豆板醤、バター、オリーブオイル、サラダ油、ごま油、ブラックペッパー、一味とうがらし、トマトケチャップ、マヨネーズ、ウスターソース、オイスターソース";
+const DEF_I="にんじん、たまねぎ、キノコ類(えのき、しめじ)、葉物野菜(小松菜またはほうれん草)、豆腐、たまご、豚バラ、合挽き肉、パスタ、米、お麩、塩昆布、かつおぶし、トマト缶";
+const DEF_S="醤油、塩、砂糖、味醂、味噌、酒、本だし、鶏ガラスープの元、コンソメ、ニンニクチューブ、生姜チューブ、白だし、鷹の爪、豆板醤、バター、オリーブオイル、サラダ油、ごま油、ブラックペッパー、一味とうがらし、トマトケチャップ、マヨネーズ、ウスターソース、オイスターソース";
 
-    function showNotification(msg, isError = false) {
-        const div = document.createElement('div');
-        div.className = `fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-medium text-sm shadow-xl z-50 transition-all duration-300 ${isError ? 'bg-red-500' : 'bg-gray-800'}`;
-        div.textContent = msg;
-        document.body.appendChild(div);
-        setTimeout(() => div.remove(), 4000);
+function showNotif(msg,isErr=false){
+    const d=document.createElement('div');
+    d.className=`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-medium text-sm shadow-xl z-50 transition-all duration-300 ${isErr?'bg-red-500':'bg-gray-800'}`;
+    d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),4000);
+}
+
+function getSeason(){
+    const m=new Date().getMonth()+1;
+    if([3,4,5].includes(m))return{s:"春（軽やかで春の訪れを感じるような味わい）",b:"🌸 春の彩り"};
+    if([6,7,8].includes(m))return{s:"夏（夏バテ防止のスタミナ系、さっぱりした味わい）",b:"🌻 夏のスタミナ"};
+    if([9,10,11].includes(m))return{s:"秋（秋の味覚を感じさせる深い味わい）",b:"🍂 秋の味覚"};
+    return{s:"冬（体が温まるようなほっこりした味わい）",b:"⛄️ 冬の温もり"};
+}
+
+function toggleSettings(){
+    const a=document.getElementById('settings-area');a.classList.toggle('hidden');
+    if(!a.classList.contains('hidden')){
+        document.getElementById('stock-ingredients').value=localStorage.getItem('k_st_i')||DEF_I;
+        document.getElementById('stock-seasonings').value=localStorage.getItem('k_st_s')||DEF_S;
+        document.getElementById('api-key').value=''; updateKeyUI();
     }
+}
 
-    function getSeasonalContext() {
-        const m = new Date().getMonth() + 1;
-        if ([3, 4, 5].includes(m)) return { str: "春（軽やかで春の訪れを感じるような味わい）", badge: "🌸 春の彩り" };
-        if ([6, 7, 8].includes(m)) return { str: "夏（夏バテ防止のスタミナ系、さっぱりした味わい）", badge: "🌻 夏のスタミナ" };
-        if ([9, 10, 11].includes(m)) return { str: "秋（秋の味覚を感じさせる深い味わい）", badge: "🍂 秋の味覚" };
-        return { str: "冬（体が温まるようなほっこりした味わい）", badge: "⛄️ 冬の温もり" };
+function resetStockToDefault(){
+    if(confirm('常備食材・調味料を初期値に戻しますか？')){
+        document.getElementById('stock-ingredients').value=DEF_I;
+        document.getElementById('stock-seasonings').value=DEF_S;
+        showNotif('初期値に戻しました');
     }
+}
 
-    function getSystemPrompt(mode) {
-        const seasonal = getSeasonalContext();
-        const stockI = localStorage.getItem('konda_stock_ingredients') || DEFAULT_STOCK_I;
-        const stockS = localStorage.getItem('konda_stock_seasonings') || DEFAULT_STOCK_S;
+function updateKeyUI(){
+    const k=localStorage.getItem('gemini_api_key'), ic=document.getElementById('key-status-icon'), bx=document.getElementById('current-key-status');
+    if(k){
+        document.getElementById('masked-key').textContent=k.substring(0,4)+'***'+k.substring(k.length-4);
+        bx.classList.remove('hidden');ic.textContent='✅';ic.classList.add('text-green-300');ic.classList.remove('text-yellow-300');
+    }else{
+        bx.classList.add('hidden');ic.textContent='⚠️';ic.classList.add('text-yellow-300');ic.classList.remove('text-green-300');
+    }
+}
+
+function saveAllSettings(){
+    const k=document.getElementById('api-key').value.trim();if(k)localStorage.setItem('gemini_api_key',k);
+    localStorage.setItem('k_st_i',document.getElementById('stock-ingredients').value.trim()||DEF_I);
+    localStorage.setItem('k_st_s',document.getElementById('stock-seasonings').value.trim()||DEF_S);
+    showNotif('✅ 設定を保存しました');toggleSettings();updateKeyUI();
+}
+
+function clearApiKey(){if(confirm('削除しますか？')){localStorage.removeItem('gemini_api_key');updateKeyUI();document.getElementById('api-key').value='';}}
+window.onload=function(){updateKeyUI();if(!localStorage.getItem('k_st_i')){localStorage.setItem('k_st_i',DEF_I);localStorage.setItem('k_st_s',DEF_S);}}
+
+async function generateRecipe(){
+    const key=localStorage.getItem('gemini_api_key');
+    if(!key){showNotif('設定からAPIキーを登録してください',true);toggleSettings();return;}
+    const t=document.getElementById('ingredients-text').value.trim(), r=document.getElementById('requirements-text').value.trim();
+    const g=document.querySelector('input[name="genre"]:checked').value, m=document.querySelector('input[name="mode"]:checked').value;
+    const o=[];if(document.getElementById('opt-jitan').checked)o.push("時短");if(document.getElementById('opt-oiwai').checked)o.push("お祝い");if(document.getElementById('opt-tsukurioki').checked)o.push("作り置き");
+    if(!t&&!r&&o.length===0){showNotif('食材か要望を入力してください',true);return;}
+
+    const btn=document.getElementById('submit-btn'), sp=document.getElementById('loading-spinner');
+    btn.disabled=true;document.getElementById('btn-text').textContent='AIが考え中...';sp.classList.remove('hidden');document.getElementById('result-area').classList.add('hidden');
+
+    try{
+        let ut=`食材:\n${t||"常備から提案して"}\n要望:\n${r}\nジャンル:${g}\n`;if(o.length>0)ut+=`優先OP:${o.join('、')}\n`;
+        const sea=getSeason(), fStr=m==="side_only"?`{"sideDishes":[{"name":"名1","recipe":"作り方(2〜3行)"},{"name":"名2","recipe":"作り方"},{"name":"名3","recipe":"作り方"}]}`:`{"mainDishes":[{"name":"主菜1","recipe":"作り方(大人向け)"},{"name":"主菜2","recipe":"作り方"},{"name":"主菜3","recipe":"作り方"}],"sideDish":{"name":"副菜名","recipe":"作り方(1行)"}}`;
+        const sys=`プロの料理研究家。JSON形式のみで出力。\n常備食材:${localStorage.getItem('k_st_i')}\n常備調味料:${localStorage.getItem('k_st_s')}\n季節感:${sea.s}\nフォーマット:\n${fStr}`;
         
-        const formatStr = mode === "side_only" 
-            ? `ユーザーは【副菜のみ】を求めています。\n【出力形式】必ず以下のJSON形式のみで出力してください。\n{"sideDishes": [{"name": "副菜名1", "recipe": "作り方(2〜3行以内)"}, {"name": "副菜名2", "recipe": "作り方(2〜3行以内)"}, {"name": "副菜名3", "recipe": "作り方(2〜3行以内)"}]}`
-            : `ユーザーは【献立(主菜＋副菜)】を求めています。\n【出力形式】必ず以下のJSON形式のみで出力してください。\n{"mainDishes": [{"name": "主菜名1", "recipe": "作り方(3行以内。大人向けアレンジを強調)"}, {"name": "主菜名2", "recipe": "作り方(3行以内)"}, {"name": "主菜名3", "recipe": "作り方(3行以内)"}], "sideDish": {"name": "副菜名", "recipe": "主菜に合う副菜の作り方(1行程度)"}}`;
-
-        return `あなたは大人向けのプロの料理研究家です。以下のストックは自由に使えます。
-【常備食材】\n${stockI}
-【常備調味料】\n${stockS}
-【重要】白だしや塩昆布ばかりに偏らず、様々な調味料をバランス良く活用してください。
-現在は季節感として「${seasonal.str}」を少し取り入れてください。
-${formatStr}`;
-    }
-
-    function toggleSettings() {
-        const area = document.getElementById('settings-area');
-        area.classList.toggle('hidden');
-        if (!area.classList.contains('hidden')) {
-            document.getElementById('stock-ingredients').value = localStorage.getItem('konda_stock_ingredients') || DEFAULT_STOCK_INGREDIENTS;
-            document.getElementById('stock-seasonings').value = localStorage.getItem('konda_stock_seasonings') || DEFAULT_STOCK_SEASONINGS;
-            document.getElementById('api-key').value = ''; 
-            updateKeyStatusUI();
-        }
-    }
-
-    function resetStockToDefault() {
-        if(confirm('常備食材・調味料を初期値に戻しますか？')) {
-            document.getElementById('stock-ingredients').value = DEFAULT_STOCK_INGREDIENTS;
-            document.getElementById('stock-seasonings').value = DEFAULT_STOCK_SEASONINGS;
-            showNotification('初期値に戻しました。(保存ボタンで確定します)');
-        }
-    }
-
-    function updateKeyStatusUI() {
-        const k = localStorage.getItem('gemini_api_key');
-        const icon = document.getElementById('key-status-icon');
-        const statusBox = document.getElementById('current-key-status');
-        if (k) {
-            document.getElementById('masked-key').textContent = k.substring(0, 4) + '***' + k.substring(k.length - 4);
-            statusBox.classList.remove('hidden');
-            icon.textContent = '✅';
-            icon.classList.add('text-green-300'); icon.classList.remove('text-yellow-300');
-        } else {
-            statusBox.classList.add('hidden');
-            icon.textContent = '⚠️';
-            icon.classList.add('text-yellow-300'); icon.classList.remove('text-green-300');
-        }
-    }
-
-    function saveAllSettings() {
-        const k = document.getElementById('api-key').value.trim();
-        if (k) localStorage.setItem('gemini_api_key', k);
-        localStorage.setItem('konda_stock_ingredients', document.getElementById('stock-ingredients').value.trim() || DEFAULT_STOCK_INGREDIENTS);
-        localStorage.setItem('konda_stock_seasonings', document.getElementById('stock-seasonings').value.trim() || DEFAULT_STOCK_SEASONINGS);
-        showNotification('✅ 設定を保存しました');
-        toggleSettings(); 
-        updateKeyStatusUI();
-    }
-
-    function clearApiKey() {
-        if(confirm('保存されているAPIキーを削除しますか？')) {
-            localStorage.removeItem('gemini_api_key');
-            updateKeyStatusUI();
-            document.getElementById('api-key').value = '';
-        }
-    }
-
-    window.onload = function() {
-        updateKeyStatusUI();
-        if(!localStorage.getItem('konda_stock_ingredients')) {
-            localStorage.setItem('konda_stock_ingredients', DEFAULT_STOCK_INGREDIENTS);
-            localStorage.setItem('konda_stock_seasonings', DEFAULT_STOCK_SEASONINGS);
-        }
-    }
-
-    async function generateRecipe() {
-        const apiKey = localStorage.getItem('gemini_api_key');
-        if (!apiKey) { showNotification('先に設定からAPIキーを登録してください', true); toggleSettings(); return; }
+        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,{
+            method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({system_instruction:{parts:[{text:sys}]},contents:[{role:"user",parts:[{text:ut}]}],generationConfig:{temperature:0.85,response_mime_type:"application/json"}})
+        });
+        if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(`APIエラー: ${res.status} ${err.error?.message||''}`);}
         
-        const text = document.getElementById('ingredients-text').value.trim();
-        const reqText = document.getElementById('requirements-text').value.trim();
-        const genre = document.querySelector('input[name="genre"]:checked').value;
-        const mode = document.querySelector('input[name="mode"]:checked').value;
-        const opts = [];
-        if (document.getElementById('opt-jitan').checked) opts.push("時短");
-        if (document.getElementById('opt-oiwai').checked) opts.push("お祝い");
-        if (document.getElementById('opt-tsukurioki').checked) opts.push("作り置き");
-        
-        if (!text && !reqText && opts.length === 0) { showNotification('食材かご要望を入力してください', true); return; }
+        const d=await res.json(), raw=d.candidates[0].content.parts[0].text.replace(/```json/gi,'').replace(/```/g,'').trim();
+        renderRes(JSON.parse(raw),m,sea.b);
+    }catch(e){alert(e.message+"\nAPIキーを確認してください。");}finally{btn.disabled=false;document.getElementById('btn-text').textContent='AIに提案してもらう';sp.classList.add('hidden');}
+}
 
-        const btn = document.getElementById('submit-btn');
-        const spinner = document.getElementById('loading-spinner');
-        btn.disabled = true; document.getElementById('btn-text').textContent = 'AIが美味しく料理中...';
-        spinner.classList.remove('hidden');
-        document.getElementById('result-area').classList.add('hidden');
+function renderRes(d,m,bTxt){
+    const mc=document.getElementById('main-dishes-container'), sb=document.getElementById('side-dish-container-box'), sc=document.getElementById('side-dish-container');
+    mc.innerHTML='';sc.innerHTML='';
+    if(m==='side_only'){
+        document.getElementById('result-title-text').textContent='おすすめの副菜 提案 (3案)';sb.classList.add('hidden');
+        if(d.sideDishes)d.sideDishes.forEach((x,i)=>{mc.innerHTML+=`<div class="bg-white border-l-4 border-green-500 p-4 rounded-r-xl shadow-sm"><h3 class="font-bold text-lg mb-2"><span class="text-green-600 mr-2 text-xl font-black">案${i+1}.</span>${eH(x.name)}</h3><p class="text-gray-600 text-sm">${eH(x.recipe)}</p></div>`;});
+    }else{
+        document.getElementById('result-title-text').textContent='今日の提案メニュー';sb.classList.remove('hidden');
+        if(d.mainDishes)d.mainDishes.forEach((x,i)=>{mc.innerHTML+=`<div class="bg-white border-l-4 border-indigo-500 p-4 rounded-r-xl shadow-sm"><h3 class="font-bold text-lg mb-2"><span class="text-indigo-600 mr-2 text-xl font-black">案${i+1}.</span>${eH(x.name)}</h3><p class="text-gray-600 text-sm">${eH(x.recipe)}</p></div>`;});
+        if(d.sideDish)sc.innerHTML=`<p><span class="font-bold text-blue-900">${eH(d.sideDish.name)}</span><br>${eH(d.sideDish.recipe)}</p>`;
+    }
+    const bdg=document.getElementById('season-badge');bdg.textContent=bTxt;bdg.classList.remove('hidden');
+    const ra=document.getElementById('result-area');ra.classList.remove('hidden');
+    setTimeout(()=>ra.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+function eH(s){return s?String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])):''}
+</script>
+</body>
+</html>
 
-        try {
-            let userText = `今日使いたい食材：\n${text || "特になし（常備食材から提案してください）"}\n\n`;
-            if (reqText) userText += `細かい要望・補足：\n${reqText}\n\n`;
-            userText += `希望のジャンル：${genre}\n`;
